@@ -1,0 +1,11 @@
+appscript; sys_platform == 'darwin'
+keyboard
+lxml; sys_platform == 'darwin'
+pyautogui
+pynput
+pyobjc-framework-ApplicationServices; sys_platform == 'darwin'
+pyperclip
+PySimpleGUI
+pywin32; sys_platform == 'win32'
+six
+tableaudocumentapi

@@ -1,8 +1,22 @@
 from calc_viewer import CalcViewer as cv
-from win32gui import GetWindowText, GetForegroundWindow, GetClassName
 import pyautogui as ag
 import re, time
-import win32clipboard
+
+if __import__("sys").platform == "darwin":
+    from _darwin.compat import win32clipboard
+    from _darwin.compat.win32gui import GetClassName
+    from _darwin.compat.win32gui import GetForegroundWindow
+    from _darwin.compat.win32gui import GetWindowText
+
+    CTRL = "command"
+else:
+    import win32clipboard
+    from win32gui import GetClassName
+    from win32gui import GetForegroundWindow
+    from win32gui import GetWindowText
+
+    CTRL = "ctrl"
+
 
 def get_field() -> tuple[str, str]:
     dsname = ''
@@ -23,7 +37,7 @@ def get_field_in_qtform(win_title: str) -> tuple[str, str]:
     else:
         ag.doubleClick(duration=0.01)
 
-    ag.hotkey('ctrl', 'c')
+    ag.hotkey(CTRL, 'c')
     OpenClipboardWithEvilRetries()
     clip_field = win32clipboard.GetClipboardData()
     win32clipboard.CloseClipboard()
@@ -40,8 +54,8 @@ def get_field_in_qtform(win_title: str) -> tuple[str, str]:
         finame = str(ptn[1])
 
     elif len(ptn) == 0:
-        ag.hotkey('ctrl', 'a', interval=0.01)
-        ag.hotkey('ctrl', 'c', interval=0.01)
+        ag.hotkey(CTRL, 'a', interval=0.01)
+        ag.hotkey(CTRL, 'c', interval=0.01)
         OpenClipboardWithEvilRetries()
         clip_field2 = win32clipboard.GetClipboardData()
         win32clipboard.CloseClipboard()
