@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>English</string>
+
+  <key>CFBundleExecutable</key>
+  <string>Tableau-Calc-Viewer.command</string>
+
+  <key>CFBundleIdentifier</key>
+  <string>com.ferveyes.Tableau-Calc-Viewer</string>
+
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+
+  <key>CFBundlePackageType</key>
+  <string>FEYE</string>
+
+  <key>CFBundleSignature</key>
+  <string>tcav</string>
+
+  <key>CFBundleSupportedPlatforms</key>
+  <array>
+    <string>MacOSX</string>
+  </array>
+
+  <key>LSEnvironment</key>
+  <dict>
+    <key>PATH</key>
+    <string>/Library/Frameworks/Python.framework/Versions/3.19/bin:/Library/Frameworks/Python.framework/Versions/3.18/bin:/Library/Frameworks/Python.framework/Versions/3.17/bin:/Library/Frameworks/Python.framework/Versions/3.16/bin:/Library/Frameworks/Python.framework/Versions/3.15/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+
+</dict>
+</plist>

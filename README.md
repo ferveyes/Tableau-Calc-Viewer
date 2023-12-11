@@ -10,3 +10,7 @@ This tool is an aid for efficient analysis of calculated fields in Tableau. You 
 8. The target calculated field window will then be newly launched.
 9. Please watch the video to see how it has been done so far.
 https://youtu.be/7o7OjOqTC5A
+
+## Building app bundle for macOS
+
+You can build an app bundle for macOS by running `make clean build dmg` on Windows with Python 3.11, `make`, and Docker installed.

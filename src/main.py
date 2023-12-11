@@ -1,8 +1,31 @@
+if __import__("sys").platform == "darwin":
+    from _darwin import tkutil
+    from os import environ
+
+    if environ.get("__CFBundleIdentifier", "").startswith("com.ferveyes."):
+        from _darwin.bundle import cwd
+        from _darwin.bundle import pypkg
+
+        with tkutil.exit_on_exception(pypkg.PackagesInstalled):
+            pypkg.ensure(appscript="appscript",
+                         lxml="lxml",
+                         HIServices="pyobjc-framework-ApplicationServices")
+        cwd.to_appdir()
+
+    from _darwin import perm
+
+    with tkutil.exit_on_exception(perm.AccessibilityBlocked):
+        perm.probe_accessibility()
+
+    from _darwin.compat import keyboard
+else:
+    import keyboard
+
 from calc_viewer import CalcViewer as cv
 import field_utility as fu
 import sg_utility as sgu
 import PySimpleGUI as sg
-import glob, sys, time, threading, keyboard
+import glob, sys, time, threading
 
 sg.theme('DarkGrey8')
 
@@ -44,7 +67,7 @@ class Receive():
         self.thread = threading.Thread(target=self.target)
         self.thread.start()
 
-if __name__ == '__main__':
+def main():
     r = Receive()
 
     def startEvent(window: sg.Window):
@@ -119,3 +142,6 @@ if __name__ == '__main__':
                 if fi.window != cv.window:
                     fi.window.close()
             cv.fields.clear()
+
+if __name__ == '__main__':
+    main()
