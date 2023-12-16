@@ -14,7 +14,7 @@ class CalcViewer():
         self.caption = ft[0]
         self.calc = ft[1]
         layout = [
-            [sg.Multiline(self.calc, key='-mline-', expand_x=True, expand_y=True, enable_events=True)],
+            [sg.Multiline(self.calc, font=('Arial', 17), key='-mline-', expand_x=True, expand_y=True, enable_events=True)],
         ]
         self.window = sg.Window(self.caption, layout, size=(700, 300), finalize=True, keep_on_top=True, resizable=True)
 
