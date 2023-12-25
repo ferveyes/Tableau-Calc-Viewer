@@ -19,7 +19,7 @@ def GetWindowText(proc):
 def GetClassName(proc):
     ident = proc.bundle_identifier()[0]
     type_ = proc.creator_type()[0]
-    if ident == "com.tableausoftware.tableaupublic":
+    if ident.startswith("com.tableausoftware"):
         return "Qt"
     elif ident == "org.python.python" and type_.lower() == "pytx":
         return "Tk"
