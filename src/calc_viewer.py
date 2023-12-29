@@ -3,6 +3,7 @@ from tab_document import TabDocument
 import sg_utility as sgu
 import PySimpleGUI as sg
 import os
+from pathlib import Path
 
 class CalcViewer():
     window: sg.Window = None
@@ -24,7 +25,7 @@ class CalcViewer():
 
     @classmethod
     def scan(cls, values):
-        twbpath = values['-twbpath-']
+        twbpath = Path(values['-twbpath-'])
         if not os.path.isfile(twbpath):
             sg.popup('Specified file does not exist')
             return
