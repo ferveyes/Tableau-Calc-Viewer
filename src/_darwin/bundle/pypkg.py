@@ -3,11 +3,10 @@ Created on 2023/03/28
 
 @author: YouheiSakurai
 '''
-from os import environ
 from os import system
-from pathlib import Path
 from subprocess import check_call
 from sys import executable
+from tempfile import NamedTemporaryFile
 
 
 class PackagesInstalled(Exception):
@@ -21,14 +20,13 @@ def ensure(**modules):
         for module in modules:
             __import__(module)
     except ImportError:
-        logfile = Path.home() / (
-            "." +
-            environ.get("__CFBundleIdentifier", "pip-install").split(".")[-1] +
-            ".log"
-        )
-        logfile.unlink(missing_ok=True)
-        logfile.touch(exist_ok=True)
-        system(f'open "{logfile}"')
+        with NamedTemporaryFile(mode="w",
+                                encoding="ascii",
+                                errors="replace",
+                                prefix="pip-install-",
+                                suffix=".log",
+                                delete=False) as fp:
+            system(f'open "{fp.name}"')
 
         cmd = (
             executable,
@@ -43,7 +41,7 @@ def ensure(**modules):
             # "--only-binary",
             # ":all:",
             "--log",
-            str(logfile),
+            fp.name,
         ) + tuple(modules.values())
         check_call(cmd)
         raise PackagesInstalled()
