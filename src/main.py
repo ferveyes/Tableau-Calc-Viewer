@@ -26,6 +26,16 @@ import field_utility as fu
 import sg_utility as sgu
 import PySimpleGUI as sg
 import glob, sys, time, threading
+from os import getcwd
+from pathlib import Path
+
+
+class NameOnlyPath(Path):
+    _flavour = Path()._flavour
+
+    def __str__(self):
+        return self.name
+
 
 sg.theme('DarkGrey8')
 
@@ -81,7 +91,7 @@ def main():
         sys.exit()
 
     def get_current_paths() -> tuple[str, str]:
-        cur_paths = glob.glob('*.twb*')
+        cur_paths = tuple(map(NameOnlyPath, glob.glob(getcwd() + '/*.twb*')))
         cur_value = '' if len(cur_paths) == 0 else cur_paths[0]
         return cur_value, cur_paths
 
@@ -98,7 +108,7 @@ def main():
             [sg.Combo(cur_paths, default_value=cur_value, key='-twbpath-', size=(50, 1))],
             [sg.Button('Reload Current Path', pad=((5, 5), (5, 3))),
              sg.FileBrowse('...', target='-twbpath-', file_types=(('Tableau Workbook', '*.twb*'), ),
-             initial_folder='.', pad=((5, 5), (5, 3)))]
+             initial_folder=getcwd(), pad=((5, 5), (5, 3)))]
         ], pad=(0, 0))]
     ]
 
