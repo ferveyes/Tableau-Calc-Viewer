@@ -13,12 +13,15 @@ if __import__("sys").platform == "darwin":
             pypkg.ensure(appscript="appscript",
                          lxml="lxml",
                          HIServices="pyobjc-framework-ApplicationServices")
-        cwd.to_appdir()
+        cwd.patch()
 
     from _darwin import perm
 
     with tkutil.exit_on(perm.AccessibilityBlocked):
         perm.probe_accessibility()
+
+    with tkutil.exit_on(perm.FilesAndFoldersBlocked, perm.AccessObtained):
+        perm.probe_files_and_folders()
 
     from _darwin.compat import keyboard
 else:
