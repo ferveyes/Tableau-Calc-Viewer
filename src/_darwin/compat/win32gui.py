@@ -3,6 +3,7 @@ Created on 2023/12/09
 
 @author: YouheiSakurai
 '''
+import sys
 
 from appscript import app
 from appscript import its
@@ -22,6 +23,10 @@ def GetClassName(proc):
     if ident.startswith("com.tableausoftware"):
         return "Qt"
     elif ident == "org.python.python" and type_.lower() == "pytx":
+        return "Tk"
+    elif (ident.startswith("com.ferveyes.") and
+          getattr(sys, "frozen", False) and
+          hasattr(sys, "_MEIPASS")):
         return "Tk"
     else:
         return ""

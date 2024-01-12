@@ -1,0 +1,7 @@
+keyboard
+pyautogui
+pynput
+pyperclip
+PySimpleGUI==4.60.5
+six
+tableaudocumentapi

@@ -1,28 +1,5 @@
 if __import__("sys").platform == "darwin":
-    from _darwin import tkutil
-    from os import environ
-
-    if environ.get("__CFBundleIdentifier", "").startswith("com.ferveyes."):
-        from _darwin.bundle import cwd
-        from _darwin.bundle import exchook
-        from _darwin.bundle import pypkg
-
-        __import__("sys").excepthook = exchook.excepthook
-
-        with tkutil.exit_on(pypkg.PackagesInstalled):
-            pypkg.ensure(appscript="appscript",
-                         lxml="lxml",
-                         HIServices="pyobjc-framework-ApplicationServices")
-        cwd.patch()
-
-    from _darwin import perm
-
-    with tkutil.exit_on(perm.AccessibilityBlocked):
-        perm.probe_accessibility()
-
-    with tkutil.exit_on(perm.FilesAndFoldersBlocked, perm.AccessObtained):
-        perm.probe_files_and_folders()
-
+    __import__("_darwin.compat").compat.init()
     from _darwin.compat import keyboard
 else:
     import keyboard
