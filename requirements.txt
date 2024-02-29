@@ -1,11 +1,5 @@
 appscript; sys_platform == 'darwin'
-keyboard
 lxml; sys_platform == 'darwin'
-pyautogui
-pynput
 pyobjc-framework-ApplicationServices; sys_platform == 'darwin'
-pyperclip
-PySimpleGUI==4.60.5
 pywin32; sys_platform == 'win32'
-six
-tableaudocumentapi
+-r requirements-zipapp.txt

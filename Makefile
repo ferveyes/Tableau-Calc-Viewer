@@ -1,6 +1,15 @@
 
 PYTHON=python3
+BUILD_DIR=build
 NAME=Tableau-Calc-Viewer
+
+SCRIPTNAME=src/main.py
+ifeq ($(shell ${PYTHON} -c "import platform; print(platform.system())"), Windows)
+	VENV_PYTHON = $(BUILD_DIR)\venv\Scripts\python -E
+else
+	VENV_PYTHON = $(BUILD_DIR)/venv/bin/python -E
+endif
+
 SIGN=tcav
 MAIN=main:main
 PYPKG=https://www.python.org/ftp/python/3.11.7/python-3.11.7-macos11.pkg
@@ -42,60 +51,52 @@ define INFO_PLIST
 </plist>
 endef
 
-.PHONY: clean 
+RM_RF=$(PYTHON) -c "__import__('shutil').rmtree(__import__('sys').argv[1], ignore_errors=True)"
+CP=$(PYTHON) -c "__import__('shutil').copy(*__import__('sys').argv[1:])"
+PRINTENV=$(PYTHON) -c "print(__import__('os').environ[__import__('sys').argv[1]])"
+MKDIR_P=$(PYTHON) -c "__import__('os').makedirs(__import__('sys').argv[1], exist_ok=True)"
+DOWNLOAD=$(PYTHON) -c "__import__('urllib.request').request.urlretrieve(*__import__('sys').argv[1:])"
+
+.PHONY: clean
 clean:
-	rmdir /q /s build >NUL || exit /b 0
-
-.PHONY: appdir 
-appdir:
-	mkdir build\app
-
-.PHONY: bdist_wheel
-bdist_wheel:
-	$(PYTHON) setup.py bdist_wheel --dist-dir build
-
-.PHONY: install_requirements
-install_requirements:
-	$(PYTHON) -m pip --disable-pip-version-check install -r requirements.txt --no-deps --no-user --target build\app
-
-.PHONY: installt_wheel
-installt_wheel:
-	$(PYTHON) -m pip --disable-pip-version-check install --no-index --find-links build --no-user --target build\app $(NAME)
+	$(RM_RF) $(BUILD_DIR)
 
 .PHONY: zipapp
 zipapp:
-	$(PYTHON) -m zipapp --python "/usr/bin/env python3" --main "$(MAIN)" --output build\$(NAME).pyz build\app
+	$(MKDIR_P) $(BUILD_DIR)/zipapp
+	$(PYTHON) -m pip --disable-pip-version-check install --no-user --no-deps --target build/zipapp .
+	$(PYTHON) -m pip --disable-pip-version-check install --no-user --no-deps --target build/zipapp -r requirements-zipapp.txt
+	$(PYTHON) -m zipapp --python "/usr/bin/env python3" --main "$(MAIN)" --output build/$(NAME).pyz build/zipapp
+
+export INFO_PLIST
+.PHONY: app_bundle
+app_bundle:
+	$(MKDIR_P) $(BUILD_DIR)/dist/$(NAME).app/Contents/MacOS
+	echo FEYE$(SIGN)>$(BUILD_DIR)/dist/$(NAME).app/Contents/PkgInfo
+	$(PRINTENV) INFO_PLIST>$(BUILD_DIR)/dist/$(NAME).app/Contents/Info.plist
+	$(CP) $(BUILD_DIR)/$(NAME).pyz $(BUILD_DIR)/dist/$(NAME).app/Contents/MacOS/$(NAME).command
 
 .PHONY: download_pypkg
 download_pypkg:
-	pushd build && curl -O $(PYPKG) && popd
+	$(DOWNLOAD) $(PYPKG) $(BUILD_DIR)/$(notdir $(PYPKG))
 
-.PHONY: docker_createdmg
-docker_createdmg:
-	docker run -it -v "${CURDIR}:/project" -w /project --entrypoint /usr/bin/make sporsh/create-dmg createdmg
+.PHONY: mkdmg
+mkdmg:
+	docker run -it -v "${CURDIR}:/work" -w /work --entrypoint /usr/bin/make sporsh/create-dmg createdmg
 
-.PHONY: dmgdir
-dmgdir:
-	mkdir -p /tmp/dmg
+.PHONY: createdmg
+createdmg:
+	mkdir -p /tmp/dmg/
+	cp /work/$(BUILD_DIR)/*.pkg /tmp/dmg/
+	cp -R /work/$(BUILD_DIR)/dist/$(NAME).app /tmp/dmg/
+	chmod +x /tmp/dmg/$(NAME).app/Contents/MacOS/*
+	bash /create-dmg.sh "$(NAME)" /tmp/dmg /work/$(BUILD_DIR)/$(NAME).dmg
 
-export INFO_PLIST
-.PHONY: contents
-contents:
-	mkdir -p /tmp/dmg/$(NAME).app/Contents
-	echo 'FEYE$(SIGN)' > /tmp/dmg/$(NAME).app/Contents/PkgInfo
-	echo "$$INFO_PLIST" > /tmp/dmg/$(NAME).app/Contents/Info.plist
-
-.PHONY: macos
-macos:
-	mkdir -p /tmp/dmg/$(NAME).app/Contents/MacOS
-	cp /project/build/$(NAME).pyz /tmp/dmg/$(NAME).app/Contents/MacOS/$(NAME).command
-	chmod +x /tmp/dmg/$(NAME).app/Contents/MacOS/*.command
-
-.PHONY: run_createdmg
-run_createdmg:
-	cp /project/build/*.pkg /tmp/dmg/
-	bash /create-dmg.sh "$(NAME)" /tmp/dmg /project/build/$(NAME).dmg
-
-build: appdir bdist_wheel install_requirements installt_wheel zipapp
-dmg: download_pypkg docker_createdmg
-createdmg: dmgdir contents macos run_createdmg
+.PHONY: pyinstaller
+pyinstaller:
+	$(MKDIR_P) $(BUILD_DIR)/venv
+	$(PYTHON) -m venv $(BUILD_DIR)/venv
+	$(VENV_PYTHON) -m pip --disable-pip-version-check install .
+	$(VENV_PYTHON) -m pip --disable-pip-version-check install -r requirements.txt
+	$(VENV_PYTHON) -m pip --disable-pip-version-check install pyinstaller
+	$(VENV_PYTHON) -m PyInstaller --distpath $(BUILD_DIR)/dist --name $(NAME) --onefile --noconsole --noconfirm --osx-bundle-identifier com.ferveyes.$(NAME) $(SCRIPTNAME)
